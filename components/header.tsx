@@ -36,8 +36,8 @@ export default function Header() {
       {/* Menu desktop */}
       <nav className="hidden md:flex gap-10 text-xl">
         <Link href="/" className={navLinks("/")}>Acceuil</Link>
-        <Link href="/fonctionalites" className={navLinks("/fonctionalites")}>Fonctionalités</Link>
         <Link href="/about" className={navLinks("/about")}>A propos</Link>
+        <Link href="/fonctionalites" className={navLinks("/fonctionalites")}>Fonctionalités</Link>
         <Link href="/langues" className={navLinks("/langues")}>Langues</Link>
       </nav>
 
@@ -63,10 +63,10 @@ export default function Header() {
       {/* Menu Mobile */}
       {IsMenuOpen &&(
         <div className="absolute top-full left-0 w-full px-3 py-5 bg-white shadow-md md:hidden">
-          <nav className="flex flex-col gap-10 text-xl">
+          <nav className="flex flex-col gap-2 text-xl">
             <Link href="/" className={navLinks("/")}>Acceuil</Link>
-            <Link href="/fonctionalites" className={navLinks("/fonctionalites")}>Fonctionalités</Link>
             <Link href="/about" className={navLinks("/about")}>A propos</Link>
+            <Link href="/fonctionalites" className={navLinks("/fonctionalites")}>Fonctionalités</Link>
             <Link href="/langues" className={navLinks("/langues")}>Langues</Link>
           </nav>
           <button className="bg-[#1E7F43] hover:bg-[#0f3d22] text-white font-bold py-2 px-4 rounded-xl mt-3 shadow-xl w-full">Se connecter</button>

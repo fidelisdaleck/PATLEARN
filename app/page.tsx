@@ -15,6 +15,7 @@ import Card from "@/components/card";
 import Cardicon from "@/components/cardicon";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -38,9 +39,9 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 text-center justify-center">
-            <button className="bg-[#1E7F43] hover:bg-[#0f3d22] transition text-white font-bold py-3 px-6 rounded-xl shadow-xl">
+            <Link href="/choix" className="bg-[#1E7F43] hover:bg-[#0f3d22] transition text-white font-bold py-3 px-6 rounded-xl shadow-xl">
               Essayer l&apos;application
-            </button>
+            </Link>
             <button className="bg-[#F1C40F] hover:bg-[#b69d3c] transition text-white font-bold py-3 px-6 rounded-xl shadow-xl">
               Inscrivez-vous gratuitement
             </button>
@@ -128,9 +129,9 @@ export default function Home() {
         </div>
 
         <div className="text-center mt-10">
-          <button className="bg-[#1E7F43] hover:bg-[#0f3d22] transition text-white font-bold py-3 px-6 rounded-xl shadow-xl">
+          <Link href="/choix" className="bg-[#1E7F43] hover:bg-[#0f3d22] transition text-white font-bold py-3 px-6 rounded-xl shadow-xl">
             Faites votre choix maintenant
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -221,9 +222,9 @@ export default function Home() {
             <span className="text-[#D7AD04]">ARN</span>
           </p>
           <div className="text-center">
-            <button className="bg-[#1E7F43] hover:bg-[#0f3d22] text-white font-bold py-2 px-5 rounded-xl shadow-xl">
+            <Link href="/choix" className="bg-[#1E7F43] hover:bg-[#0f3d22] text-white font-bold py-2 px-5 rounded-xl shadow-xl">
               Commencez maintenant
-            </button>
+            </Link>
           </div>
         </div>
       </section>
