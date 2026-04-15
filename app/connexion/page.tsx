@@ -28,7 +28,7 @@ export default function Inscriptipn() {
           </form>
         </div>
         <div className="flex justify-center items-center">
-            <div className="flex gap-1">
+            <div className="flex flex-col md:flex-row gap-1">
                 <p>Vous n&rsquo;avez pas encore de compte?</p>
                 <Link href="/inscription" className="text-blue-500 underline">
                     Inscrivez-vous

@@ -33,7 +33,7 @@ export default function Inscription() {
           </form>
         </div>
         <div className="flex justify-center items-center">
-            <div className="flex gap-1">
+            <div className="flex flex-col md:flex-row gap-1">
                 <p>Vous avez deja un compte?</p>
                 <Link href="/connexion" className="text-blue-500 underline">
                     connectez-vous
