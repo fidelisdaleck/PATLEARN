@@ -31,6 +31,9 @@ export default function Footer() {
           <h2 className="text-xl text-white">Liens Rapides</h2>
           <ul className="text-10 text-[#7c7c7c]">
             <li className="mt-2 hover:text-[#1E7F43] cursor-pointer">
+              Acceuil
+            </li>
+            <li className="mt-2 hover:text-[#1E7F43] cursor-pointer">
               Fonctionalités
             </li>
             <li className="mt-2 hover:text-[#1E7F43] cursor-pointer">
