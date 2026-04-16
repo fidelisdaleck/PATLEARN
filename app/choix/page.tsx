@@ -34,7 +34,7 @@ export default function Languages() {
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {languages.map((lang, index) => (
             <Link 
-              href="/fonctionalites"
+              href="/dashboard"
               key={index}
               className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
             >

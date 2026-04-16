@@ -27,7 +27,7 @@ export default function PronunciationPage() {
   };
 
   return (
-    <div className="w-full max-w-none px-10 py-6">
+    <div className="w-full max-w-none md:px-10 py-6">
       {/* Title */}
       <h2 className="text-4xl md:text-6xl font-semibold">
         Prononciation <span className="text-[#1e7f43]">Duala</span>

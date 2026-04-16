@@ -11,7 +11,7 @@ export default function LessonsPage() {
   ];
 
   return (
-    <div className="w-full max-w-none px-10 py-6">
+    <div className="w-full max-w-none md:px-10 py-6">
       <h2 className="text-4xl md:text-6xl font-semibold">
         Leçons de <span className="text-[#1e7f43]">Duala</span>
       </h2>

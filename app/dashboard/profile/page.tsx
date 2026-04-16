@@ -2,7 +2,7 @@ import { User, LogOut, Languages, Moon } from "lucide-react";
 import Link from "next/link";
 export default function ProfilPage() {
   return (
-    <div className="px-10">
+    <div className="md:px-10">
       <h2 className="text-3xl md:text-5xl font-semibold">Mon profil.</h2>
       <p className="text-[#444444] text-xl mt-2">
         Gères ton compte et tes préférences ici.
