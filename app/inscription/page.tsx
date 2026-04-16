@@ -34,7 +34,7 @@ export default function Inscription() {
         </div>
         <div className="flex justify-center items-center">
             <div className="flex flex-col md:flex-row gap-1">
-                <p>Vous avez deja un compte?</p>
+                <p>Vous avez deja créé un compte?</p>
                 <Link href="/connexion" className="text-blue-500 underline">
                     connectez-vous
                 </Link>

@@ -20,7 +20,7 @@ export default function Header() {
     }`;
 
   return (
-    <header className="flex items-center justify-between px-8 py-1 shadow-lg sticky top-0 w-full bg-white z-50">
+    <header className="flex flex-row items-center justify-between px-8 py-1 shadow-lg sticky top-0 w-full bg-white z-50">
       {/* logo */}
       <div>
         <Image
