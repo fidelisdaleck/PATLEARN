@@ -82,13 +82,13 @@ export default function ProfilPage() {
                 href="#"
                 className="mt-10 w-full text-10 flex items-center justify-center gap-2 bg-[#1E7F43] hover:bg-[#ffffff] hover:border-2 hover:text-black border-[#1e7f43] transition text-white font-bold px-5 py-3 rounded-xl shadow-xl"
             >
-            Francais
+            Clair
           </Link>
           <Link
                 href="#"
                 className="mt-10 w-full text-10 flex items-center justify-center gap-2 bg-[#ffffff] border-2 border-[#1e7f43] hover:bg-[#1E7F43] hover:text-white  transition text- font-bold px-5 py-3 rounded-xl shadow-xl"
             >
-            Anglais
+            Sombre
           </Link>
           </div>
         </div>

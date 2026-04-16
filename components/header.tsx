@@ -44,7 +44,7 @@ export default function Header() {
       {/* CTA */}
       <div className="flex items-center gap-4">
         <div className="hidden md:block">
-          <button className="bg-[#1E7F43] hover:bg-[#0f3d22] text-white font-bold py-2 px-4 rounded-xl shadow-xl">Se connecter</button>
+          <Link href="/connexion" className="bg-[#1E7F43] hover:bg-[#0f3d22] text-white font-bold py-2 px-4 rounded-xl shadow-xl">Se connecter</Link>
         </div>
 
         {/* Hamburger mobile */}
@@ -69,7 +69,7 @@ export default function Header() {
             <Link href="/fonctionalites" className={navLinks("/fonctionalites")}>Fonctionalités</Link>
             <Link href="/langues" className={navLinks("/langues")}>Langues</Link>
           </nav>
-          <button className="bg-[#1E7F43] hover:bg-[#0f3d22] text-white font-bold py-2 px-4 rounded-xl mt-3 shadow-xl w-full">Se connecter</button>
+          <Link href="/connexion" className="bg-[#1E7F43] hover:bg-[#0f3d22] text-white font-bold py-2 px-4 rounded-xl mt-3 shadow-xl w-full">Se connecter</Link>
         </div>
       )}
     </header>
