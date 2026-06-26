@@ -1,6 +1,18 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { User, LogOut, Languages, Moon } from "lucide-react";
-import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+
 export default function ProfilPage() {
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/connexion");
+  };
+
   return (
     <div className="md:px-10">
       <h2 className="text-3xl md:text-5xl font-semibold">Mon profil.</h2>
@@ -19,31 +31,27 @@ export default function ProfilPage() {
             <User size={42} className="text-[#333333]" />
           </div>
           <p className="text-[#1e7f43] font-semibold text-lg mt-5">
-            Patlearn CULTURE
+            {user?.username ?? "Utilisateur"}
           </p>
         </div>
         <div className="space-y-2">
           <p className="text-[#444444] text-lg">
-            Nom: <span className="font-medium">Patlearn</span>
+            Nom: <span className="font-medium">{user?.username ?? "-"}</span>
           </p>
           <p className="text-[#444444] text-lg">
-            Prénom: <span className="font-medium">Culture</span>
-          </p>
-          <p className="text-[#444444] text-lg">
-            Email:{" "}
-            <span className="font-medium">patlearnculture@gmail.com</span>
+            Email: <span className="font-medium">{user?.email ?? "-"}</span>
           </p>
         </div>
 
         {/* LOG-OUT */}
         <div className="flex justify-center">
-          <Link
-            href="#"
+          <button
+            onClick={handleLogout}
             className="mt-10 w-full text-xl flex items-center justify-center gap-2 bg-[#1E7F43] hover:bg-[#ffffff] hover:border-2 hover:text-black border-[#1e7f43] transition text-white font-bold px-5 py-3 rounded-xl shadow-xl"
           >
             <LogOut size={20} className="text-[#d70404]" />
-            Deconnexion
-          </Link>
+            Déconnexion
+          </button>
         </div>
       </section>
 

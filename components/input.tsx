@@ -1,18 +1,16 @@
 "use client"
 
-interface Inputprops{
-    type?:string;
-    placeholder?:string;
-}
+import React from "react";
 
-export default function Input({type = "text", placeholder}: Inputprops){
-    return(
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+export default function Input({ className = "", ...props }: InputProps) {
+    return (
         <div className="space-y-2">
             <input 
-                type={type}
-                placeholder={placeholder}
-                className="border border-[#444444] p-2 w-full rounded-lg focus:ring-2 focus:ring-green-600 focus:border-none outline-none" 
+                className={`border border-[#444444] p-2 w-full rounded-lg focus:ring-2 focus:ring-green-600 focus:border-none outline-none ${className}`}
+                {...props}
             />
         </div>
-    )
+    );
 }

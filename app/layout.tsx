@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 // import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "Patlearn",
@@ -15,12 +15,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body
-        
-      >
-
-        {children}
-  
+      <body>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
