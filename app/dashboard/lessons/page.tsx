@@ -1,5 +1,8 @@
+"use client"
+import {useState} from "react"
 import Link from "next/link";
 import { CheckCircle, Lock, PlayCircle } from "lucide-react";
+import { p } from "motion/react-client";
 
 export default function LessonsPage() {
   const lessons = [
@@ -9,6 +12,12 @@ export default function LessonsPage() {
     { id: 4, title: "La famille", status: "locked" },
     { id: 5, title: "Les aliments", status: "locked" },
   ];
+
+  const [loading, setLoading] = useState(true);
+
+  if(loading){
+    return <p>chargement...</p>
+  }
 
   return (
     <div className="w-full max-w-none md:px-10 py-6">
