@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -39,7 +38,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 text-center justify-center">
-            <Link href="/choix" className="bg-[#1E7F43] hover:bg-[#0f3d22] transition text-white font-bold py-3 px-6 rounded-xl shadow-xl">
+            <Link href="/admin" className="bg-[#1E7F43] hover:bg-[#0f3d22] transition text-white font-bold py-3 px-6 rounded-xl shadow-xl">
               Essayer l&apos;application
             </Link>
             <Link href="/inscription" className="bg-[#F1C40F] hover:bg-[#b69d3c] transition text-white font-bold py-3 px-6 rounded-xl shadow-xl">
