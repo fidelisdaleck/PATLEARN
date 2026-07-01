@@ -59,7 +59,7 @@ export default function AppSidebar() {
         </Link>
         <Link
           href="/dashboard/quizzes"
-          className={navLinkClass("/dashboard/quizzes")}
+          className={navLinkClass("/dashboard/quizzes/[]exerciceId")}
         >
           <CircleQuestionMark size={25} className="text-[#D7AD04]" />
           Mes quiz
