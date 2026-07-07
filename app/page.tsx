@@ -22,10 +22,10 @@ export default function Home() {
       <Header />
 
       {/* BANNIERE */}
-      <section className="bg-[linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('/images/bg.jpg')] bg-cover bg-center min-h-[80vh] flex items-center text-center">
+      <section className="bg-[linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/images/bg.jpg')] bg-cover bg-center min-h-[80vh] flex items-center text-center">
         <div className="max-w-6xl mx-auto px-5 md:px-10 space-y-8">
-          <div className="max-w-xl">
-            <h1 className="text-3xl md:text-6xl font-bold text-white leading-tight">
+          <div className="">
+            <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight">
               Apprendre une langue locale n&apos;a jamais été aussi facile.
             </h1>
             <p className="text-base md:text-2xl text-gray-300 mt-4">
