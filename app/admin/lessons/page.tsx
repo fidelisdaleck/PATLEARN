@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { BookOpen, Plus, Edit, Trash2, Filter } from "lucide-react";
 
 type Lesson = {
@@ -36,7 +35,7 @@ const initialLessons: Lesson[] = [
 ];
 
 export default function LessonsPage() {
-  const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
+  const lessons = initialLessons;
 
   return (
     <div className="p-6 space-y-6">

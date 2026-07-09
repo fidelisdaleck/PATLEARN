@@ -41,7 +41,7 @@ export default function QuestionRenderer({
       return (
         <TextInputQuestion
           question={question}
-          answer={answer as string}
+          answer={(answer as string | null) ?? ""}
           onAnswer={onAnswer}
         />
       );

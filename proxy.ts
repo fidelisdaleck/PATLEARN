@@ -1,9 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicPaths = ["/connexion", "/inscription", "/login", "/register", "/", "/about", "/fonctionalites", "/langues", "/choix", "/admin", "/dashboard"];
+const publicPaths = [
+  "/connexion",
+  "/inscription",
+  "/login",
+  "/register",
+  "/",
+  "/about",
+  "/fonctionalites",
+  "/langues",
+  "/choix",
+  "/admin",
+  "/dashboard",
+];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.match(/\.(png|jpg|jpeg|svg|webp|ico|gif|woff|woff2|ttf)$/)) {

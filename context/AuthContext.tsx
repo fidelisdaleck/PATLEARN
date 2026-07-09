@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const authenticatedUser = await getUser();
       setUser(authenticatedUser);
-    } catch (error) {
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);

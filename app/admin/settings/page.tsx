@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Settings, User, Bell, Shield, Globe } from "lucide-react";
+import { Settings, User, Shield, Globe } from "lucide-react";
 
 export default function SettingsPage() {
   const [name, setName] = useState("Admin PatLearn");

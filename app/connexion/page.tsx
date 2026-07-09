@@ -22,7 +22,7 @@ export default function ConnexionPage() {
     try {
       await login(email, password);
       router.push("/dashboard");
-    } catch (err) {
+    } catch {
       setError("Échec de connexion. Vérifiez vos identifiants.");
     } finally {
       setLoading(false);
