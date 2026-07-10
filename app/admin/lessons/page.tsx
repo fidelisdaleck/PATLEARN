@@ -1,126 +1,319 @@
 "use client";
 
-import { useState } from "react";
-import { BookOpen, Plus, Edit, Trash2, Filter } from "lucide-react";
-
-type Lesson = {
-  id: number;
-  title: string;
-  language: string;
-  level: string;
-  duration: string;
-};
-
-const initialLessons: Lesson[] = [
-  {
-    id: 1,
-    title: "Introduction à l'Ewondo",
-    language: "Ewondo",
-    level: "Débutant",
-    duration: "10 min",
-  },
-  {
-    id: 2,
-    title: "Salutations de base",
-    language: "Bassa",
-    level: "Débutant",
-    duration: "8 min",
-  },
-  {
-    id: 3,
-    title: "Grammaire essentielle",
-    language: "Duala",
-    level: "Intermédiaire",
-    duration: "15 min",
-  },
-];
+import { useEffect, useState } from "react";
+import {
+  BookOpen,
+  Plus,
+  Trash2,
+  Filter,
+  ChevronDown,
+  Search,
+} from "lucide-react";
+import {
+  getCours,
+  getLecons,
+  createLecon,
+  deleteLecon,
+  type Cours,
+  type Lecon,
+} from "@/lib/api";
 
 export default function LessonsPage() {
-  const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
+  const [cours, setCours] = useState<Cours[]>([]);
+  const [lecons, setLecons] = useState<Lecon[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCours, setSelectedCours] = useState<number | "all">("all");
+  const [search, setSearch] = useState("");
+
+  // Formulaire ajout leçon
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({
+    cours_id: "",
+    titre: "",
+    description: "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  // Charger tous les cours
+  useEffect(() => {
+    const fetchCours = async () => {
+      try {
+        const data = await getCours();
+        setCours(data);
+      } catch (err) {
+        console.error("Erreur cours:", err);
+      }
+    };
+    fetchCours();
+  }, []);
+
+  // Charger les leçons selon le cours sélectionné
+  useEffect(() => {
+    const fetchLecons = async () => {
+      setLoading(true);
+      try {
+        if (selectedCours === "all") {
+          // Charger toutes les leçons de tous les cours
+          const allLecons: Lecon[] = [];
+          for (const c of cours) {
+            const data = await getLecons(c.id);
+            allLecons.push(...data);
+          }
+          setLecons(allLecons);
+        } else {
+          const data = await getLecons(selectedCours);
+          setLecons(data);
+        }
+      } catch (err) {
+        console.error("Erreur leçons:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (cours.length > 0) {
+      fetchLecons();
+    }
+  }, [cours, selectedCours]);
+
+  const handleCreate = async () => {
+    if (!form.cours_id || !form.titre) return;
+    setSaving(true);
+    try {
+      const coursId = parseInt(form.cours_id);
+      const leconsForCours = lecons.filter((l) => l.cours_id === coursId);
+      const newLecon = await createLecon(coursId, {
+        titre: form.titre,
+        description: form.description,
+        ordre: leconsForCours.length + 1,
+      });
+      setLecons([...lecons, newLecon]);
+      setForm({ cours_id: "", titre: "", description: "" });
+      setShowForm(false);
+    } catch {
+      alert("Erreur lors de la création de la leçon");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Supprimer cette leçon ?")) return;
+    try {
+      await deleteLecon(id);
+      setLecons(lecons.filter((l) => l.id !== id));
+    } catch {
+      alert("Erreur lors de la suppression");
+    }
+  };
+
+  const getCoursNom = (cours_id: number) => {
+    return cours.find((c) => c.id === cours_id)?.nom ?? "Inconnu";
+  };
+
+  const filtered = lecons.filter(
+    (l) =>
+      l.titre.toLowerCase().includes(search.toLowerCase()) ||
+      getCoursNom(l.cours_id).toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <BookOpen /> Lessons
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <BookOpen size={24} />
+            Leçons
           </h1>
-          <p className="text-gray-500">
-            Gérer les leçons de la plateforme PatLearn
+          <p className="text-slate-500 text-sm mt-1">
+            Gérez les leçons de la plateforme PattLearn.
           </p>
         </div>
-
-        <button className="flex items-center gap-2 bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+        >
           <Plus size={18} />
           Ajouter une leçon
         </button>
       </div>
 
-      {/* Filter bar */}
-      <div className="bg-white shadow rounded-xl p-4 flex flex-col md:flex-row gap-3 md:items-center justify-between">
-        <div className="flex items-center gap-2 text-gray-600">
-          <Filter size={18} />
-          <span className="text-sm">Filtres</span>
+      {/* Formulaire ajout */}
+      {showForm && (
+        <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-4">
+          <h2 className="font-semibold text-slate-900">Nouvelle leçon</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <select
+              value={form.cours_id}
+              onChange={(e) => setForm({ ...form, cours_id: e.target.value })}
+              className="rounded-lg border border-slate-200 px-4 py-2 outline-none focus:border-green-600"
+            >
+              <option value="">Choisir un cours</option>
+              {cours.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nom}
+                </option>
+              ))}
+            </select>
+            <input
+              placeholder="Titre de la leçon"
+              value={form.titre}
+              onChange={(e) => setForm({ ...form, titre: e.target.value })}
+              className="rounded-lg border border-slate-200 px-4 py-2 outline-none focus:border-green-600"
+            />
+            <input
+              placeholder="Description"
+              value={form.description}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+              className="rounded-lg border border-slate-200 px-4 py-2 outline-none focus:border-green-600"
+            />
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleCreate}
+              disabled={saving}
+              className="rounded-lg bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              {saving ? "Création..." : "Créer"}
+            </button>
+            <button
+              onClick={() => setShowForm(false)}
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              Annuler
+            </button>
+          </div>
         </div>
+      )}
 
-        <div className="flex gap-3">
-          <select className="border rounded-lg px-3 py-2 text-sm">
-            <option>Toutes les langues</option>
-            <option>Ewondo</option>
-            <option>Bassa</option>
-            <option>Duala</option>
-          </select>
-
-          <select className="border rounded-lg px-3 py-2 text-sm">
-            <option>Tous les niveaux</option>
-            <option>Débutant</option>
-            <option>Intermédiaire</option>
-            <option>Avancé</option>
-          </select>
+      {/* Filtres */}
+      <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-col md:flex-row gap-3 md:items-center justify-between">
+        <div className="flex items-center gap-2 text-slate-600">
+          <Filter size={18} />
+          <span className="text-sm font-medium">Filtres</span>
+        </div>
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="relative">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
+            <input
+              placeholder="Rechercher une leçon..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm outline-none focus:border-green-600"
+            />
+          </div>
+          <div className="relative">
+            <select
+              value={selectedCours}
+              onChange={(e) =>
+                setSelectedCours(
+                  e.target.value === "all" ? "all" : parseInt(e.target.value)
+                )
+              }
+              className="appearance-none border border-slate-200 rounded-lg px-4 py-2 pr-8 text-sm outline-none focus:border-green-600"
+            >
+              <option value="all">Toutes les langues</option>
+              {cours.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nom}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={14}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
+          </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white shadow rounded-xl overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100 text-left">
-            <tr>
-              <th className="p-3">Titre</th>
-              <th className="p-3">Langue</th>
-              <th className="p-3">Niveau</th>
-              <th className="p-3">Durée</th>
-              <th className="p-3 text-right">Actions</th>
+          <thead className="bg-slate-50 text-left">
+            <tr className="text-slate-500">
+              <th className="px-6 py-4">Titre</th>
+              <th className="py-4">Langue</th>
+              <th className="py-4">Ordre</th>
+              <th className="py-4">Statut</th>
+              <th className="py-4 text-right pr-6">Actions</th>
             </tr>
           </thead>
-
           <tbody>
-            {lessons.map((lesson) => (
-              <tr key={lesson.id} className="border-t hover:bg-gray-50">
-                <td className="p-3 font-medium">{lesson.title}</td>
-                <td className="p-3">{lesson.language}</td>
-                <td className="p-3">{lesson.level}</td>
-                <td className="p-3">{lesson.duration}</td>
-                <td className="p-3">
-                  <div className="flex justify-end gap-2">
-                    <button className="p-2 rounded-lg hover:bg-green-100 text-green-600">
-                      <Edit size={16} />
-                    </button>
-                    <button className="p-2 rounded-lg hover:bg-red-100 text-red-600">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-6 py-10 text-center text-slate-400"
+                >
+                  Chargement...
                 </td>
               </tr>
-            ))}
+            ) : filtered.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-6 py-10 text-center text-slate-400"
+                >
+                  Aucune leçon trouvée
+                </td>
+              </tr>
+            ) : (
+              filtered.map((lecon) => (
+                <tr
+                  key={lecon.id}
+                  className="border-t border-slate-100 hover:bg-slate-50"
+                >
+                  <td className="px-6 py-4 font-medium text-slate-800">
+                    {lecon.titre}
+                  </td>
+                  <td className="py-4">
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                      {getCoursNom(lecon.cours_id)}
+                    </span>
+                  </td>
+                  <td className="py-4 text-slate-500">
+                    Leçon {lecon.ordre}
+                  </td>
+                  <td className="py-4">
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        lecon.statut === "debloque"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {lecon.statut === "debloque" ? "Débloqué" : "Verrouillé"}
+                    </span>
+                  </td>
+                  <td className="py-4 pr-6">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleDelete(lecon.id)}
+                        className="rounded-lg p-2 text-red-500 hover:bg-red-50"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
-      {lessons.length === 0 && (
-        <div className="text-center text-gray-500 py-10">
-          Aucune leçon disponible pour le moment
-        </div>
+      {/* Total */}
+      {!loading && (
+        <p className="text-sm text-slate-500 text-right">
+          {filtered.length} leçon{filtered.length > 1 ? "s" : ""} au total
+        </p>
       )}
     </div>
   );
