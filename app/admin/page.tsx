@@ -1,178 +1,151 @@
 "use client";
 
-import {
-  Users,
-  Globe,
-  BookOpen,
-  FileText,
-} from "lucide-react";
-
-import { useMemo } from "react";
+import { Users, Globe, BookOpen, FileText, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getStats, type Stats } from "@/lib/api";
+import Link from "next/link";
 
 export default function DashboardPage() {
-  // DATA MOCK (layout data)
-  const stats = useMemo(
-    () => [
-      {
-        label: "Utilisateurs",
-        value: "1 250",
-        icon: Users,
-        color: "text-green-600",
-        bg: "bg-green-50",
-      },
-      {
-        label: "Langues",
-        value: "12",
-        icon: Globe,
-        color: "text-yellow-600",
-        bg: "bg-yellow-50",
-      },
-      {
-        label: "Cours",
-        value: "185",
-        icon: BookOpen,
-        color: "text-blue-600",
-        bg: "bg-blue-50",
-      },
-      {
-        label: "Leçons",
-        value: "540",
-        icon: FileText,
-        color: "text-orange-600",
-        bg: "bg-orange-50",
-      },
-    ],
-    []
-  );
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const activities = [
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getStats();
+        setStats(data);
+      } catch (err) {
+        console.error("Erreur stats:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const statCards = [
     {
-      text: "John a terminé la leçon 12",
-      time: "Il y a 2 min",
+      label: "Utilisateurs",
+      value: stats?.users ?? 0,
+      icon: Users,
+      color: "text-green-600",
+      bg: "bg-green-50",
+      href: "/admin/users",
     },
     {
-      text: "Nouvelle langue ajoutée : Ewondo",
-      time: "Il y a 1h",
+      label: "Cours / Langues",
+      value: stats?.cours ?? 0,
+      icon: Globe,
+      color: "text-yellow-600",
+      bg: "bg-yellow-50",
+      href: "/admin/languages",
     },
     {
-      text: "Cours 'Bassa débutant' publié",
-      time: "Hier",
+      label: "Leçons",
+      value: stats?.lecons ?? 0,
+      icon: BookOpen,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+      href: "/admin/lessons",
+    },
+    {
+      label: "Questions",
+      value: stats?.questions ?? 0,
+      icon: FileText,
+      color: "text-orange-600",
+      bg: "bg-orange-50",
+      href: "/admin/languages",
     },
   ];
 
   return (
     <div className="space-y-8">
-      
-      {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">
-          Dashboard
-        </h1>
+        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
         <p className="text-sm text-slate-500">
-          Vue d&rsquo;ensemble de la plateforme PatLearn
+          Vue d&rsquo;ensemble de la plateforme PattLearn
         </p>
       </div>
 
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-red-600 text-sm">
+          Erreur lors du chargement des statistiques.
+        </div>
+      )}
+
       {/* STATS */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
+        {statCards.map((stat) => {
           const Icon = stat.icon;
-
           return (
-            <div
+            <Link
               key={stat.label}
-              className="rounded-xl border border-slate-200 bg-white p-4"
+              href={stat.href}
+              className="rounded-xl border border-slate-200 bg-white p-4 hover:shadow-md transition"
             >
               <div className="flex items-center justify-between">
-                
                 <div>
-                  <p className="text-sm text-slate-500">
-                    {stat.label}
-                  </p>
-                  <p className="text-xl font-semibold text-slate-900">
-                    {stat.value}
+                  <p className="text-sm text-slate-500">{stat.label}</p>
+                  <p className="text-2xl font-bold text-slate-900 mt-1">
+                    {loading ? (
+                      <span className="inline-block h-6 w-12 bg-slate-200 rounded animate-pulse" />
+                    ) : (
+                      stat.value
+                    )}
                   </p>
                 </div>
-
-                <div
-                  className={`rounded-lg p-2 ${stat.bg}`}
-                >
-                  <Icon className={stat.color} size={20} />
+                <div className={`rounded-lg p-3 ${stat.bg}`}>
+                  <Icon className={stat.color} size={22} />
                 </div>
-
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
 
-      {/* MAIN GRID */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        
-        {/* CHART SECTION */}
-        <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">
-            Progression des apprenants
-          </h2>
-
-          {/* Mock chart */}
-          <div className="flex h-64 items-end gap-2">
-            {[40, 70, 50, 90, 60, 80, 100].map((h, i) => (
-              <div
-                key={i}
-                className="flex-1 rounded-md bg-blue-700"
-                style={{ height: `${h}%` }}
-              />
-            ))}
-          </div>
-
-          <p className="mt-3 text-xs text-slate-500">
-            Activité des 7 derniers jours
-          </p>
-        </div>
-
-        {/* ACTIVITY */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">
-            Activités récentes
-          </h2>
-
-          <div className="space-y-4">
-            {activities.map((a, i) => (
-              <div key={i} className="border-b border-slate-100 pb-3">
-                <p className="text-sm text-slate-700">{a.text}</p>
-                <p className="text-xs text-slate-400">{a.time}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* QUICK ACTIONS */}
+      {/* ACTIONS RAPIDES */}
       <div className="rounded-xl border border-slate-200 bg-white p-6">
         <h2 className="mb-4 text-lg font-semibold text-slate-900">
           Actions rapides
         </h2>
-
         <div className="flex flex-wrap gap-3">
-          <button className="rounded-lg bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700">
-            + Ajouter un cours
-          </button>
-
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            Ajouter une langue
-          </button>
-
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            Créer une leçon
-          </button>
-
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-            Voir statistiques
-          </button>
+          <Link
+            href="/admin/languages"
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 transition"
+          >
+            Gérer les langues
+          </Link>
+          <Link
+            href="/admin/lessons"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+          >
+            Gérer les leçons
+          </Link>
+          <Link
+            href="/admin/users"
+            className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition"
+          >
+            Gérer les utilisateurs
+          </Link>
         </div>
       </div>
 
+      {/* INFO */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6">
+        <div className="flex items-center gap-3 mb-2">
+          <TrendingUp className="text-green-600" size={20} />
+          <h2 className="text-lg font-semibold text-slate-900">
+            À propos de PattLearn
+          </h2>
+        </div>
+        <p className="text-sm text-slate-500">
+          PattLearn est une plateforme d&rsquo;apprentissage des langues
+          camerounaises. Elle propose des cours interactifs en Duala, Ewondo et
+          Médumba et bien d'autres à venir avec des exercices de type QCM, Vrai/Faux et saisie libre.
+        </p>
+      </div>
     </div>
   );
 }

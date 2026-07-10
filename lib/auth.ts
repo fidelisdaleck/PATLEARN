@@ -9,38 +9,55 @@ export interface RegisterPayload {
   username: string;
   email: string;
   password: string;
+  tel?: string;
 }
 
 export interface User {
   id: number;
   username: string;
   email: string;
-  role?: string;
-}
-
-export async function getCsrfCookie(): Promise<void> {
-  await api.get("/sanctum/csrf-cookie");
+  role: string;
+  tel?: string;
 }
 
 export async function login(payload: LoginPayload): Promise<User> {
-  await getCsrfCookie();
-
   const response = await api.post("/api/login", payload);
-  return (response.data.user ?? response.data) as User;
+  const { token, user } = response.data;
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+  }
+
+  return user as User;
 }
 
 export async function register(payload: RegisterPayload): Promise<User> {
-  await getCsrfCookie();
-
   const response = await api.post("/api/register", payload);
-  return (response.data.user ?? response.data) as User;
+  const { token, user } = response.data;
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+  }
+
+  return user as User;
 }
 
 export async function logout(): Promise<void> {
-  await api.post("/api/logout");
+  try {
+    await api.post("/api/logout");
+  } catch {
+    // Ignorer les erreurs de logout
+  } finally {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
+  }
 }
 
 export async function getUser(): Promise<User> {
-  const response = await api.get("/api/user");
-  return (response.data.user ?? response.data) as User;
+  const response = await api.get("/api/me");
+  return response.data as User;
 }

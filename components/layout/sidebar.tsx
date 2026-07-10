@@ -19,7 +19,7 @@ const navItems = [
   { label: "Langues", href: "/admin/languages", icon: Globe },
   { label: "Cours", href: "/admin/courses", icon: BookOpen },
   { label: "Leçons", href: "/admin/lessons", icon: FileText },
-  { label: "Paramètres", href: "/dashboard/settings", icon: Settings },
+  { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
