@@ -25,7 +25,7 @@ export default function InscriptionPage() {
       await register({ username, email, password });
       await refreshUser();
       router.push("/dashboard");
-    } catch (err) {
+    } catch {
       setError("Impossible de créer le compte. Veuillez vérifier les informations saisies.");
     } finally {
       setLoading(false);
