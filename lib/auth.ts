@@ -20,14 +20,22 @@ export interface User {
   tel?: string;
 }
 
+function persistSession(token: string, user: User) {
+  if (typeof window === "undefined") return;
+
+  localStorage.setItem("token", token);
+  localStorage.setItem("user", JSON.stringify(user));
+
+  // Cookies lus par le middleware (proxy.ts) pour protéger les routes
+  document.cookie = `token=${token}; path=/`;
+  document.cookie = `user=${encodeURIComponent(JSON.stringify(user))}; path=/`;
+}
+
 export async function login(payload: LoginPayload): Promise<User> {
   const response = await api.post("/api/login", payload);
   const { token, user } = response.data;
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-  }
+  persistSession(token, user);
 
   return user as User;
 }
@@ -36,10 +44,7 @@ export async function register(payload: RegisterPayload): Promise<User> {
   const response = await api.post("/api/register", payload);
   const { token, user } = response.data;
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-  }
+  persistSession(token, user);
 
   return user as User;
 }

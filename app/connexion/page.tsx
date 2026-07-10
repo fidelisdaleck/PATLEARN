@@ -21,10 +21,6 @@ export default function ConnexionPage() {
     try {
       const loggedUser = await login(email, password);
 
-      // Sauvegarder dans cookie pour le middleware
-      document.cookie = `token=${localStorage.getItem("token")}; path=/`;
-      document.cookie = `user=${encodeURIComponent(JSON.stringify(loggedUser))}; path=/`;
-
       // Rediriger selon le rôle
       if (loggedUser?.role === "admin") {
         router.push("/admin");
