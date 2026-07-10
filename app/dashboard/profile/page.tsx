@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { User, LogOut, Languages, Moon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link"
 
 export default function ProfilPage() {
   const router = useRouter();

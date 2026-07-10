@@ -8,12 +8,21 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { getUser, login as loginRequest, logout as logoutRequest, type User } from "@/lib/auth";
+import {
+  getUser,
+  login as loginRequest,
+  logout as logoutRequest,
+  register as registerRequest,
+  type User,
+  type LoginPayload,
+  type RegisterPayload,
+} from "@/lib/auth";
 
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (payload: RegisterPayload) => Promise<User>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -27,10 +36,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = async () => {
     setLoading(true);
     try {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      if (!token) {
+        setUser(null);
+        return;
+      }
       const authenticatedUser = await getUser();
       setUser(authenticatedUser);
-    } catch (error) {
+    } catch {
       setUser(null);
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
     } finally {
       setLoading(false);
     }
@@ -40,11 +59,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void refreshUser();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     setLoading(true);
     try {
       const authenticatedUser = await loginRequest({ email, password });
       setUser(authenticatedUser);
+      return authenticatedUser;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (payload: RegisterPayload): Promise<User> => {
+    setLoading(true);
+    try {
+      const newUser = await registerRequest(payload);
+      setUser(newUser);
+      return newUser;
     } finally {
       setLoading(false);
     }
@@ -61,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ user, loading, login, logout, refreshUser }),
+    () => ({ user, loading, login, register, logout, refreshUser }),
     [user, loading]
   );
 

@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Input from "@/components/input";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { register } from "@/lib/auth";
 
 export default function InscriptionPage() {
   const router = useRouter();
-  const { refreshUser } = useAuth();
+  const { register } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,11 +20,21 @@ export default function InscriptionPage() {
     setLoading(true);
 
     try {
-      await register({ username, email, password });
-      await refreshUser();
-      router.push("/dashboard");
-    } catch (err) {
-      setError("Impossible de créer le compte. Veuillez vérifier les informations saisies.");
+      const newUser = await register({ username, email, password });
+
+      // Sauvegarder dans cookie pour le middleware
+      document.cookie = `token=${localStorage.getItem("token")}; path=/`;
+      document.cookie = `user=${encodeURIComponent(JSON.stringify(newUser))}; path=/`;
+
+      router.push("/choix");
+    } catch (err: any) {
+      const errors = err?.response?.data?.errors;
+      if (errors) {
+        const firstError = Object.values(errors)[0] as string[];
+        setError(firstError[0]);
+      } else {
+        setError("Une erreur est survenue. Vérifiez vos informations.");
+      }
     } finally {
       setLoading(false);
     }
@@ -36,46 +44,65 @@ export default function InscriptionPage() {
     <div>
       <section className="space-y-3 px-10 md:px-20">
         <div className="px-16 md:px-30 py-10">
-          <h1 className="text-3xl text-center md:text-5xl text-[#1e7f43]">Inscription</h1>
+          <h1 className="text-3xl text-center md:text-5xl text-[#1e7f43]">
+            Inscription
+          </h1>
         </div>
+
+        {error && (
+          <div className="max-w-md mx-auto bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-3 text-sm">
+            {error}
+          </div>
+        )}
+
         <div>
-          <form onSubmit={handleSubmit} className="space-y-8 flex flex-col max-w-md mx-auto">
-            <Input
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-8 flex flex-col max-w-md mx-auto"
+          >
+            <input
               name="username"
               type="text"
-              placeholder="Entrez votre nom"
+              placeholder="Votre nom d'utilisateur"
               value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1e7f43] w-full"
             />
-            <Input
+            <input
               name="email"
               type="email"
               placeholder="exemple@gmail.com"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1e7f43] w-full"
             />
-            <Input
+            <input
               name="password"
               type="password"
               placeholder="********"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1e7f43] w-full"
             />
-            {error ? <p className="text-red-600">{error}</p> : null}
             <button
               type="submit"
               disabled={loading}
-              className="bg-[#1E7F43] hover:bg-[#ffffff] hover:border-2 hover:text-black border-[#1e7f43] text-white font-bold px-3 py-2 md:py-3 md:px-6 rounded-lg w-full shadow-xl disabled:opacity-50"
+              className="bg-[#1E7F43] hover:bg-[#166335] text-white font-bold px-3 py-3 rounded-lg w-full shadow-xl disabled:opacity-50 transition"
             >
-              {loading ? "Création..." : "Rejoignez nous"}
+              {loading ? "Inscription en cours..." : "Rejoignez nous"}
             </button>
           </form>
         </div>
-        <div className="flex justify-center items-center">
-          <div className="flex flex-col md:flex-row gap-1">
-            <p>Vous avez deja créé un compte?</p>
+
+        <div className="flex justify-center items-center pt-4">
+          <div className="flex flex-col md:flex-row gap-1 text-center">
+            <p>Vous avez déjà un compte?</p>
             <Link href="/connexion" className="text-blue-500 underline">
-              connectez-vous
+              Connectez-vous
             </Link>
           </div>
         </div>

@@ -1,42 +1,62 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicPaths = ["/connexion", "/inscription", "/login", "/register", "/", "/about", "/fonctionalites", "/langues", "/choix"];
+// Pages qui nécessitent d'être connecté
+const protectedRoutes = ["/choix", "/dashboard", "/admin"];
 
-export async function middleware(request: NextRequest) {
+// Pages réservées aux admins
+const adminRoutes = ["/admin"];
+
+// Pages publiques 
+const authRoutes = ["/connexion", "/inscription"];
+
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const token = request.cookies.get("token")?.value;
+  const userCookie = request.cookies.get("user")?.value;
 
-  if (pathname.match(/\.(png|jpg|jpeg|svg|webp|ico|gif|woff|woff2|ttf)$/)) {
-    return NextResponse.next();
+  let userRole: string | null = null;
+  if (userCookie) {
+    try {
+      const user = JSON.parse(decodeURIComponent(userCookie));
+      userRole = user?.role ?? null;
+    } catch {
+      userRole = null;
+    }
   }
 
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon.ico") ||
-    pathname.startsWith("/api")
-  ) {
-    return NextResponse.next();
+  // Redirige vers /connexion si page protégée et non connecté
+  const isProtected = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+  if (isProtected && !token) {
+    return NextResponse.redirect(new URL("/connexion", request.url));
   }
 
-  const isPublic = publicPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
-  const response = NextResponse.next();
-
-  if (isPublic) {
-    return response;
+  // Redirige vers /choix si page admin et pas admin
+  const isAdmin = adminRoutes.some((route) => pathname.startsWith(route));
+  if (isAdmin && userRole !== "admin") {
+    return NextResponse.redirect(new URL("/connexion", request.url));
   }
 
-  const token = request.cookies.get("laravel_session") || request.cookies.get("XSRF-TOKEN");
-
-  if (!token) {
-    const loginUrl = new URL("/connexion", request.url);
-    return NextResponse.redirect(loginUrl);
+  // Redirige si déjà connecté et tente d'accéder à connexion/inscription
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  if (isAuthRoute && token) {
+    if (userRole === "admin") {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+    return NextResponse.redirect(new URL("/choix", request.url));
   }
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|images|public|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.webp|.*\\.ico|.*\\.gif).*)",
+    "/connexion",
+    "/inscription",
+    "/choix",
+    "/dashboard/:path*",
+    "/admin/:path*",
   ],
 };
