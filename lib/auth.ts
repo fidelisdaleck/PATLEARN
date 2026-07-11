@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api, clearSession } from "./axios";
 
 export interface LoginPayload {
   email: string;
@@ -55,10 +55,7 @@ export async function logout(): Promise<void> {
   } catch {
     // Ignorer les erreurs de logout
   } finally {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-    }
+    clearSession();
   }
 }
 

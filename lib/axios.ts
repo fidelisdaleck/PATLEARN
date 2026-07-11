@@ -26,13 +26,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Efface la session (localStorage + cookies lus par le middleware proxy.ts)
+export function clearSession() {
+  if (typeof window === "undefined") return;
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+}
+
 // Gérer les erreurs 401 (token expiré)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      clearSession();
       window.location.href = "/connexion";
     }
     return Promise.reject(error);

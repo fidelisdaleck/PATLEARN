@@ -17,6 +17,7 @@ import {
   type LoginPayload,
   type RegisterPayload,
 } from "@/lib/auth";
+import { clearSession } from "@/lib/axios";
 
 interface AuthContextValue {
   user: User | null;
@@ -46,10 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(authenticatedUser);
     } catch {
       setUser(null);
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
+      clearSession();
     } finally {
       setLoading(false);
     }
