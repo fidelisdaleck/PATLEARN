@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Users,
   Globe,
-  BookOpen,
   FileText,
   Settings,
 } from "lucide-react";
@@ -16,8 +15,7 @@ import {
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Utilisateurs", href: "/admin/users", icon: Users },
-  { label: "Langues", href: "/admin/languages", icon: Globe },
-  { label: "Cours", href: "/admin/courses", icon: BookOpen },
+  { label: "Langues & Cours", href: "/admin/languages", icon: Globe },
   { label: "Leçons", href: "/admin/lessons", icon: FileText },
   { label: "Paramètres", href: "/admin/settings", icon: Settings },
 ];

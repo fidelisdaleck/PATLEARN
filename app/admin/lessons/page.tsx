@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   BookOpen,
+  ListChecks,
   Plus,
   Trash2,
   Filter,
@@ -294,6 +296,13 @@ export default function LessonsPage() {
                   </td>
                   <td className="py-4 pr-6">
                     <div className="flex justify-end gap-2">
+                      <Link
+                        href={`/admin/lessons/${lecon.id}`}
+                        className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        <ListChecks size={16} />
+                        Exercices
+                      </Link>
                       <button
                         onClick={() => handleDelete(lecon.id)}
                         className="rounded-lg p-2 text-red-500 hover:bg-red-50"

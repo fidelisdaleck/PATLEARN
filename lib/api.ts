@@ -25,6 +25,7 @@ export interface Exercise {
   titre: string;
   description: string;
   ordre: number;
+  questions?: Question[];
 }
 
 export interface Question {
@@ -134,6 +135,18 @@ export const getExercises = async (lecon_id: number): Promise<Exercise[]> => {
   return res.data;
 };
 
+export const createExercise = async (
+  lecon_id: number,
+  data: { titre: string; description: string; ordre: number }
+): Promise<Exercise> => {
+  const res = await api.post(`/api/admin/lecons/${lecon_id}/exercises`, data);
+  return res.data.exercise;
+};
+
+export const deleteExercise = async (id: number): Promise<void> => {
+  await api.delete(`/api/admin/exercises/${id}`);
+};
+
 // ================================
 // QUESTIONS
 // ================================
@@ -142,6 +155,23 @@ export const getQuestions = async (
 ): Promise<Question[]> => {
   const res = await api.get(`/api/exercises/${exercise_id}/questions`);
   return res.data;
+};
+
+export const createQuestion = async (
+  exercise_id: number,
+  data: {
+    question: string;
+    type: "qcm" | "vrai_faux" | "texte_libre";
+    reponse_correcte: string;
+    options?: string[] | null;
+  }
+): Promise<Question> => {
+  const res = await api.post(`/api/admin/exercises/${exercise_id}/questions`, data);
+  return res.data.question;
+};
+
+export const deleteQuestion = async (id: number): Promise<void> => {
+  await api.delete(`/api/admin/questions/${id}`);
 };
 
 // ================================

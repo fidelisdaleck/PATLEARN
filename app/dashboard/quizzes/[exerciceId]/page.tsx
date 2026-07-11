@@ -219,7 +219,14 @@ export default function LessonPage() {
     setSubmitting(true);
 
     try {
-      const result = await submitAnswer(backendQuestion.id, String(answer ?? ""));
+      const answerToSubmit =
+        backendQuestion.type === "vrai_faux"
+          ? answer === true
+            ? "vrai"
+            : "faux"
+          : String(answer ?? "");
+
+      const result = await submitAnswer(backendQuestion.id, answerToSubmit);
       const isCorrect = result.statut === "correct";
 
       const updatedAnswers = [...answers];
