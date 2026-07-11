@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   CircleQuestionMark,
@@ -16,10 +16,19 @@ import {
   User,
   LogOut,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AppSidebar() {
 
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/connexion");
+  };
+
   const navLinkClass = (path: string) =>
     `text-lg px-4 py-1 flex gap-2 rounded-lg transition-all duration-100
     ${
@@ -80,13 +89,13 @@ export default function AppSidebar() {
           <User size={25} className="text-[#D7AD04]" />
           Profil
         </Link>
-        <Link
-          href="/dashboard/deconnexion"
-          className={navLinkClass("/dashboard/deconnexion")}
+        <button
+          onClick={handleLogout}
+          className={`w-full text-left ${navLinkClass("/dashboard/deconnexion")}`}
         >
           <LogOut size={25} className="text-[#d70404]" />
           Deconnexion
-        </Link>
+        </button>
       </SidebarFooter>
     </Sidebar>
   );

@@ -12,6 +12,7 @@ import {
   getUser,
   login as loginRequest,
   logout as logoutRequest,
+  persistSession,
   register as registerRequest,
   type User,
   type LoginPayload,
@@ -45,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const authenticatedUser = await getUser();
       setUser(authenticatedUser);
+      persistSession(token, authenticatedUser);
     } catch {
       setUser(null);
       clearSession();

@@ -20,7 +20,7 @@ export interface User {
   tel?: string;
 }
 
-function persistSession(token: string, user: User) {
+export function persistSession(token: string, user: User) {
   if (typeof window === "undefined") return;
 
   localStorage.setItem("token", token);

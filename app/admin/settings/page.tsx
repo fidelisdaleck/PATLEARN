@@ -40,7 +40,7 @@ export default function SettingsPage() {
     setProfileSuccess(false);
     setProfileError("");
     try {
-      await api.put("/api/admin/profile", { username, email });
+      await api.put("/api/profile", { username, email });
       await refreshUser();
       setProfileSuccess(true);
       setTimeout(() => setProfileSuccess(false), 3000);
@@ -68,7 +68,7 @@ export default function SettingsPage() {
 
     setSavingPassword(true);
     try {
-      await api.put("/api/admin/password", {
+      await api.put("/api/password", {
         current_password: currentPassword,
         new_password: newPassword,
         new_password_confirmation: confirmPassword,
