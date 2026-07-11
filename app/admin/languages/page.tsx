@@ -1,6 +1,6 @@
 "use client";
 
-import { Globe, Plus, Search, Trash2, ChevronDown, ChevronUp, BookOpen } from "lucide-react";
+import { Globe, Plus, Search, Trash2, ChevronDown, ChevronUp, BookOpen, Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   getCours,
@@ -9,8 +9,12 @@ import {
   getLecons,
   createLecon,
   deleteLecon,
+  getMots,
+  createMot,
+  deleteMot,
   type Cours,
   type Lecon,
+  type Mot,
 } from "@/lib/api";
 
 export default function LanguagesPage() {
@@ -30,6 +34,16 @@ export default function LanguagesPage() {
   const [showLeconForm, setShowLeconForm] = useState<number | null>(null);
   const [leconForm, setLeconForm] = useState({ titre: "", description: "" });
   const [savingLecon, setSavingLecon] = useState(false);
+
+  // Mots (prononciation) par cours
+  const [expandedMots, setExpandedMots] = useState<number | null>(null);
+  const [motsByCours, setMotsByCours] = useState<Record<number, Mot[]>>({});
+  const [loadingMots, setLoadingMots] = useState(false);
+
+  // Formulaire ajout mot
+  const [showMotForm, setShowMotForm] = useState<number | null>(null);
+  const [motForm, setMotForm] = useState({ mot: "", traduction: "" });
+  const [savingMot, setSavingMot] = useState(false);
 
   const fetchCours = async () => {
     try {

@@ -37,6 +37,15 @@ export interface Question {
   options?: string[];
 }
 
+export interface Mot {
+  id: number;
+  cours_id: number;
+  mot: string;
+  traduction: string;
+  ordre: number;
+  audio_url?: string | null;
+}
+
 export interface UserType {
   id: number;
   username: string;
@@ -172,6 +181,26 @@ export const createQuestion = async (
 
 export const deleteQuestion = async (id: number): Promise<void> => {
   await api.delete(`/api/admin/questions/${id}`);
+};
+
+// ================================
+// MOTS (PRONONCIATION)
+// ================================
+export const getMots = async (cours_id: number): Promise<Mot[]> => {
+  const res = await api.get(`/api/cours/${cours_id}/mots`);
+  return res.data;
+};
+
+export const createMot = async (
+  cours_id: number,
+  data: { mot: string; traduction: string; ordre: number; audio_url?: string | null }
+): Promise<Mot> => {
+  const res = await api.post(`/api/admin/cours/${cours_id}/mots`, data);
+  return res.data.mot;
+};
+
+export const deleteMot = async (id: number): Promise<void> => {
+  await api.delete(`/api/admin/mots/${id}`);
 };
 
 // ================================
