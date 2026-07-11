@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle, RotateCcw, ArrowRight } from "lucide-react";
+import { updateProgression } from "@/lib/api";
 
 export default function ResultsContent() {
   const searchParams = useSearchParams();
@@ -13,6 +15,21 @@ export default function ResultsContent() {
 
   const percentage = Math.round((score / total) * 100);
   const isSuccess = percentage >= 70;
+
+  useEffect(() => {
+    const leconIdNumber = Number(leconId);
+
+    if (!leconIdNumber) {
+      return;
+    }
+
+    updateProgression(leconIdNumber, {
+      score: percentage,
+      statut: isSuccess ? "termine" : "en_cours",
+    }).catch(() => {
+      // La leçon reste consultable même si l'enregistrement de la progression échoue
+    });
+  }, [leconId, percentage, isSuccess]);
 
   const statusColor = isSuccess ? "text-green-600" : "text-orange-500";
   const bgColor = isSuccess ? "bg-green-50" : "bg-orange-50";
@@ -26,6 +43,11 @@ export default function ResultsContent() {
   }
 
   function handleRetry() {
+    if (leconId) {
+      router.push(`/lesson/${leconId}`);
+      return;
+    }
+
     router.back();
   }
 

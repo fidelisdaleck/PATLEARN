@@ -25,6 +25,8 @@ export default function LessonStartPage() {
       return;
     }
 
+    setError(null);
+
     try {
       const exercises = await getLessonExercises(lessonId);
       const firstExercise = exercises[0];
@@ -34,44 +36,15 @@ export default function LessonStartPage() {
         return;
       }
 
-      router.replace(`/dashboard/quizzes/${firstExercise.id}`);
+      router.replace(`/dashboard/quizzes/${firstExercise.id}?leconId=${lessonId}`);
     } catch {
       setError("Impossible de charger l'exercice de cette leçon.");
     }
   }, [lessonId, router]);
 
   useEffect(() => {
-    if (!lessonId) {
-      return;
-    }
-
-    let isMounted = true;
-
-    getLessonExercises(lessonId)
-      .then((exercises) => {
-        if (!isMounted) {
-          return;
-        }
-
-        const firstExercise = exercises[0];
-
-        if (!firstExercise) {
-          setError("Aucun exercice n'est disponible pour cette leçon.");
-          return;
-        }
-
-        router.replace(`/dashboard/quizzes/${firstExercise.id}`);
-      })
-      .catch(() => {
-        if (isMounted) {
-          setError("Impossible de charger l'exercice de cette leçon.");
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [lessonId, router]);
+    void startLesson();
+  }, [startLesson]);
 
   const displayedError = validationError ?? error;
 

@@ -12,7 +12,13 @@ import {
   TrueFalseQuestionData,
   QuestionAnswer,
 } from "@/components/quiz/types";
-import { getExerciseQuestions, submitAnswer, type BackendQuestion } from "@/lib/quizzes";
+import {
+  getExerciseQuestions,
+  getLessonExercises,
+  submitAnswer,
+  type BackendQuestion,
+  type Exercise,
+} from "@/lib/quizzes";
 
 type Question =
   | MultipleChoiceQuestionData
@@ -89,15 +95,45 @@ export default function LessonPage() {
   const router = useRouter();
   const exerciseId = getExerciseIdFromParam(params.exerciceId);
   const leconId = searchParams.get("leconId");
+  const scoreSoFar = Number(searchParams.get("scoreSoFar") ?? "0");
+  const totalSoFar = Number(searchParams.get("totalSoFar") ?? "0");
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [backendQuestions, setBackendQuestions] = useState<BackendQuestion[]>([]);
+  const [lessonExercises, setLessonExercises] = useState<Exercise[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState<QuestionAnswer>(null);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const leconIdNumber = Number(leconId);
+
+    if (!leconIdNumber) {
+      setLessonExercises([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    getLessonExercises(leconIdNumber)
+      .then((exercises) => {
+        if (isMounted) {
+          setLessonExercises(exercises);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setLessonExercises([]);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [leconId]);
 
   const loadQuestions = useCallback(async () => {
     if (!exerciseId) {
@@ -199,12 +235,23 @@ export default function LessonPage() {
         setAnswer(null);
       } else {
         const correctCount = updatedAnswers.filter((a) => a.isCorrect).length;
-        const totalQuestions = questions.length;
+        const cumulativeScore = scoreSoFar + correctCount;
+        const cumulativeTotal = totalSoFar + questions.length;
         const encodedLeconId = leconId || "unknown";
 
-        router.push(
-          `/dashboard/quizzes/results?score=${correctCount}&total=${totalQuestions}&leconId=${encodedLeconId}`
-        );
+        const currentPosition = lessonExercises.findIndex((ex) => ex.id === exerciseId);
+        const nextExercise =
+          currentPosition >= 0 ? lessonExercises[currentPosition + 1] : undefined;
+
+        if (nextExercise) {
+          router.push(
+            `/dashboard/quizzes/${nextExercise.id}?leconId=${encodedLeconId}&scoreSoFar=${cumulativeScore}&totalSoFar=${cumulativeTotal}`
+          );
+        } else {
+          router.push(
+            `/dashboard/quizzes/results?score=${cumulativeScore}&total=${cumulativeTotal}&leconId=${encodedLeconId}`
+          );
+        }
       }
     } catch {
       setError("Erreur lors de la soumission de la réponse. Veuillez réessayer.");
@@ -217,9 +264,29 @@ export default function LessonPage() {
     answer !== null &&
     !(typeof answer === "string" && answer.trim() === "");
 
+  const exercisePosition = lessonExercises.findIndex((ex) => ex.id === exerciseId);
+  const isLastExerciseOfLesson =
+    exercisePosition === -1 || exercisePosition === lessonExercises.length - 1;
+  const isLastQuestionOfExercise = currentIndex === questions.length - 1;
+
+  const nextButtonLabel = submitting
+    ? "Vérification..."
+    : !isLastQuestionOfExercise
+      ? "Question suivante"
+      : isLastExerciseOfLesson
+        ? "Terminer la leçon"
+        : "Exercice suivant";
+
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="mx-auto max-w-5xl p-6">
+        {lessonExercises.length > 0 && (
+          <p className="mb-4 text-sm font-medium text-slate-500">
+            Exercice {exercisePosition + 1} / {lessonExercises.length} · Question{" "}
+            {currentIndex + 1} / {questions.length}
+          </p>
+        )}
+
         <QuestionRenderer
           question={question}
           answer={answer}
@@ -232,11 +299,7 @@ export default function LessonPage() {
             disabled={!isAnswerValid || submitting}
             className="rounded-xl bg-green-600 px-8 py-3 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-300"
           >
-            {submitting
-              ? "Vérification..."
-              : currentIndex === questions.length - 1
-                ? "Terminer"
-                : "Question suivante"}
+            {nextButtonLabel}
           </button>
         </div>
       </div>
